@@ -1,5 +1,11 @@
 from collections import namedtuple
 
+ENGLISH_TAG = ('英语', '四级', '六级', '托福', 'TOEFL', 'Toefl', 'toefl', 
+                '雅思', 'eng', 'Eng', '单词', 'FET', 'fet', 'Fet', 'cet', 'Cet', 'CET')
+MATH_TAG = ('数学', 'math', 'Math', '数分', '高数', '离散', '线代', '高代', '代数', '几何', '逻辑')
+ENTERTAINMENT_TAG = ('看剧', '追剧', '电影', '影视')
+
+
 ToDo = namedtuple('ToDo', ['lN', 'isFinished', 'remark'])
 
 def create(uid: any) -> int:
@@ -66,15 +72,16 @@ def classify(toDoList: list[ToDo]) -> dict:
             if toDo.remark.find('#') in (-1, len(toDo.remark)-1):
                 result['Unclassified'].append(toDo)
             else:
-                if not (' ' in toDo.remark[toDo.remark.find('#'):]):
-                    kw = toDo.remark[toDo.remark.find('#')+1:]
-                else:
-                    kw = toDo.remark[toDo.remark.find('#')+1:]
-                    kw = kw[:kw.find(' ')]
-                if kw in result.keys():
-                    result[kw].append(toDo)
-                else:
-                    result[kw] = [toDo]
+                kw0 = toDo.remark
+                while kw0.find('#') != -1:
+                    kw = kw0[kw0.find('#')+1:]
+                    if ' ' in kw0[kw0.find('#'):]:
+                        kw = kw[:kw.find(' ')]
+                    if kw in result.keys():
+                        result[kw].append(toDo)
+                    else:
+                        result[kw] = [toDo]
+                    kw0 = kw0[kw0.find('#')+1:]
         return result
     except Exception as e:
         print(f'Error when classifying a list: {e}')
@@ -96,6 +103,18 @@ def addToDo(uid: any, remark: str) -> int:
     try:
         toDoList: list = readAll(uid)
         assert not -1 in toDoList
+        for each in ENGLISH_TAG:
+            if each in remark:
+                remark += ' #english'
+                break
+        for each in MATH_TAG:
+            if each in remark:
+                remark += ' #math'
+                break
+        for each in ENTERTAINMENT_TAG:
+            if each in remark:
+                remark += ' #entertainment'
+                break
         toDoList.append(ToDo('', False, remark))
         status = writeAll(uid, toDoList)
         return status
