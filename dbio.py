@@ -127,26 +127,20 @@ def addToDo(uid: any, remark: str) -> int:
         print(f'Error when adding a to-do for {str(uid)}: {e}')
         return 1
 
-def delToDo(uid: any, lN: any) -> int:
+def delToDo(uid: any, lN: str) -> int:
     try:
-        if isinstance(lN, str) and '&' in lN:
-            ls = lN.split('&')
-            result = 0
-            for each in ls:
-                result += delToDo(uid, each)
-            return result
-        else:
-            toDoList: list = readAll(uid)
-            assert not -1 in toDoList
-            flag = False
-            for i, toDo in enumerate(toDoList):
-                if toDo.lN == int(lN):
-                    toDoList.pop(i)
-                    flag = True
-                    break
-            assert flag
-            writeAll(uid, toDoList)
-            return 0
+        ls = [int(l.strip()) for l in lN.split('&')]
+        toDoList: list = readAll(uid)
+        assert not -1 in toDoList
+        flag = False
+        for i, toDo in enumerate(toDoList):
+            if toDo.lN in ls:
+                toDoList.pop(i)
+                flag = True
+                break
+        assert flag
+        writeAll(uid, toDoList)
+        return 0
     except Exception as e:
         print(f'Error when deleting a to-do for {str(uid)}: {e}')
         return 1
