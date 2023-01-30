@@ -1,7 +1,7 @@
 from collections import namedtuple
 
-ENGLISH_TAG = ('英语', '四级', '六级', '托福', 'TOEFL', 'Toefl', 'toefl', 
-                '雅思', 'eng', 'Eng', '单词', 'FET', 'fet', 'Fet', 'cet', 'Cet', 'CET')
+ENGLISH_TAG = ('英语', '单词', '听力', '口语', '四级', '六级', '托福', 'TOEFL', 'Toefl', 'toefl', 
+                '雅思', 'eng', 'Eng', 'FET', 'fet', 'Fet', 'cet', 'Cet', 'CET')
 MATH_TAG = ('数学', 'math', 'Math', '数分', '高数', '离散', '线代', '高代', '代数', '几何', '逻辑')
 ENTERTAINMENT_TAG = ('看剧', '追剧', '电影', '影视')
 
