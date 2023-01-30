@@ -129,38 +129,50 @@ def addToDo(uid: any, remark: str) -> int:
 
 def delToDo(uid: any, lN: any) -> int:
     try:
-        toDoList: list = readAll(uid)
-        assert not -1 in toDoList
-        flag = False
-        for i, toDo in enumerate(toDoList):
-            if toDo.lN == int(lN):
-                toDoList.pop(i)
-                flag = True
-                break
-        assert flag
-        writeAll(uid, toDoList)
-        return 0
+        if isinstance(lN, str) and '&' in lN:
+            ls = lN.split('&')
+        result = 0
+        for each in ls:
+            result += delToDo(uid, each)
+        else:
+            toDoList: list = readAll(uid)
+            assert not -1 in toDoList
+            flag = False
+            for i, toDo in enumerate(toDoList):
+                if toDo.lN == int(lN):
+                    toDoList.pop(i)
+                    flag = True
+                    break
+            assert flag
+            writeAll(uid, toDoList)
+            return 0
     except Exception as e:
         print(f'Error when deleting a to-do for {str(uid)}: {e}')
         return 1
 
 def markToDo(uid: any, lN: any) -> any:
     try:
-        toDoList: list = readAll(uid)
-        assert not -1 in toDoList
-        flag = False
-        for i, toDo in enumerate(toDoList):
-            toDo: ToDo
-            if toDo.lN == int(lN):
-                f = not toDo.isFinished
-                new = ToDo(toDo.lN, f, toDo.remark)
-                toDoList.pop(i)
-                toDoList.insert(i, new)
-                flag = True
-                break
-        assert flag
-        writeAll(uid, toDoList)
-        return 0
+        if isinstance(lN, str) and '&' in lN:
+            ls = lN.split('&')
+        result = 0
+        for each in ls:
+            result += delToDo(uid, each)
+        else:        
+            toDoList: list = readAll(uid)
+            assert not -1 in toDoList
+            flag = False
+            for i, toDo in enumerate(toDoList):
+                toDo: ToDo
+                if toDo.lN == int(lN):
+                    f = not toDo.isFinished
+                    new = ToDo(toDo.lN, f, toDo.remark)
+                    toDoList.pop(i)
+                    toDoList.insert(i, new)
+                    flag = True
+                    break
+            assert flag
+            writeAll(uid, toDoList)
+            return 0
     except Exception as e:
         print(f'Error when marking a to-do for {str(uid)}: {e}')
         return 1
