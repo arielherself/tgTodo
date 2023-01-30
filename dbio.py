@@ -131,9 +131,9 @@ def delToDo(uid: any, lN: any) -> int:
     try:
         if isinstance(lN, str) and '&' in lN:
             ls = lN.split('&')
-        result = 0
-        for each in ls:
-            result += delToDo(uid, each)
+            result = 0
+            for each in ls:
+                result += delToDo(uid, each)
         else:
             toDoList: list = readAll(uid)
             assert not -1 in toDoList
