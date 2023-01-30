@@ -49,7 +49,7 @@ def add(uid: any, remark: str) -> str:
             else:
                 ec = dbio.addToDo(uid, remark)
                 if ec == 0:
-                    result = f'Your to-do is created:\n<code>  {(ENDL+"  ").join([each.strip() for each in remark.split("&")])}</code>'
+                    result = f'Your to-do(s) is/are created:\n<code>  {(ENDL+"  ").join([each.strip() for each in remark.split("&")])}</code>'
                 else:
                     result = f'We cannot create your to-do at this time. Please try again later.'
         return result
@@ -64,7 +64,7 @@ def mark(uid: any, lN: any) -> str:
             return 'Please specify a to-do like this:\n  <code>/mark 9</code>\n\nYou can use /get to find the numbering of your to-dos.'
         stat = dbio.markToDo(uid, lN)
         if stat != 1:
-            return f'Status of the following to-do is updated:\n<code>{format(dbio.getToDo(uid, lN))}</code>'
+            return f'Status of the following to-do(s) is updated:\n<code>{ENDL.join([format(dbio.getToDo(uid, l)) for l in lN.split("&")])}</code>'
         else:
             return f'Cannot make changes to this to-do. Please check if you entered the correct item number.'
     except Exception as e:

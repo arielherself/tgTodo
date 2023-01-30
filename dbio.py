@@ -152,7 +152,7 @@ def markToDo(uid: any, lN: any) -> any:
             result = 0
             for each in ls:
                 result += delToDo(uid, each)
-        else:        
+        else:
             toDoList: list = readAll(uid)
             assert not -1 in toDoList
             flag = False
