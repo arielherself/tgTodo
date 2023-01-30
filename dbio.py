@@ -1,4 +1,3 @@
-from copy import deepcopy
 from collections import namedtuple
 
 ENGLISH_TAG = ('英语', '单词', '听力', '口语', '四级', '六级', '托福', 'TOEFL', 'Toefl', 'toefl', 
@@ -132,15 +131,15 @@ def delToDo(uid: any, lN: str) -> int:
     try:
         ls = [int(l.strip()) for l in lN.split('&')]
         toDoList: list = readAll(uid)
+        newList = []
         assert not -1 in toDoList
         flag = False
-        another = deepcopy(toDoList)
-        for i, toDo in enumerate(another):
-            if toDo.lN in ls:
-                toDoList.pop(i)
+        for toDo in toDoList:
+            if not toDo.lN in ls:
+                newList.append(toDo)
                 flag = True
         assert flag
-        writeAll(uid, toDoList)
+        writeAll(uid, newList)
         return 0
     except Exception as e:
         print(f'Error when deleting a to-do for {str(uid)}: {e}')
