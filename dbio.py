@@ -137,7 +137,6 @@ def delToDo(uid: any, lN: str) -> int:
             if toDo.lN in ls:
                 toDoList.pop(i)
                 flag = True
-                break
         assert flag
         writeAll(uid, toDoList)
         return 0
