@@ -134,6 +134,7 @@ def delToDo(uid: any, lN: any) -> int:
             result = 0
             for each in ls:
                 result += delToDo(uid, each)
+            return result
         else:
             toDoList: list = readAll(uid)
             assert not -1 in toDoList
