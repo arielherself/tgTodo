@@ -101,23 +101,28 @@ def getToDo(uid: any, lN: any) -> ToDo:
 
 def addToDo(uid: any, remark: str) -> int:
     try:
-        toDoList: list = readAll(uid)
-        assert not -1 in toDoList
-        for each in ENGLISH_TAG:
-            if each in remark:
-                remark += ' #english'
-                break
-        for each in MATH_TAG:
-            if each in remark:
-                remark += ' #math'
-                break
-        for each in ENTERTAINMENT_TAG:
-            if each in remark:
-                remark += ' #entertainment'
-                break
-        toDoList.append(ToDo('', False, remark))
-        status = writeAll(uid, toDoList)
-        return status
+        remark = remark.strip()
+        if '&' in remark:
+            r1, r2 = remark.split('&', 1)
+            return addToDo(uid, r1) + addToDo(uid, r2)
+        else:
+            toDoList: list = readAll(uid)
+            assert not -1 in toDoList
+            for each in ENGLISH_TAG:
+                if each in remark:
+                    remark += ' #english'
+                    break
+            for each in MATH_TAG:
+                if each in remark:
+                    remark += ' #math'
+                    break
+            for each in ENTERTAINMENT_TAG:
+                if each in remark:
+                    remark += ' #entertainment'
+                    break
+            toDoList.append(ToDo('', False, remark))
+            status = writeAll(uid, toDoList)
+            return status
     except Exception as e:
         print(f'Error when adding a to-do for {str(uid)}: {e}')
         return 1
