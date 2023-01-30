@@ -1,3 +1,4 @@
+from copy import deepcopy
 from collections import namedtuple
 
 ENGLISH_TAG = ('英语', '单词', '听力', '口语', '四级', '六级', '托福', 'TOEFL', 'Toefl', 'toefl', 
@@ -133,7 +134,8 @@ def delToDo(uid: any, lN: str) -> int:
         toDoList: list = readAll(uid)
         assert not -1 in toDoList
         flag = False
-        for i, toDo in enumerate(toDoList):
+        another = deepcopy(toDoList)
+        for i, toDo in enumerate(another):
             if toDo.lN in ls:
                 toDoList.pop(i)
                 flag = True
