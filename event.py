@@ -1,6 +1,7 @@
 import dbio
 
 ENDL = '\n'
+TODO_LIMIT = 20
 ERROR_PROMPT = 'We encountered an error when processing your request. Please try again.'
 
 def format(toDo: dbio.ToDo) -> str:
@@ -43,11 +44,14 @@ def add(uid: any, remark: str) -> str:
         if remark == '':
             result = 'Well, please set a to-do like this:\n  <code>/add Have dinner with Ariel</code>\n  <code>/add study #maths</code>'
         else:
-            ec = dbio.addToDo(uid, remark)
-            if ec == 0:
-                result = f'Your to-do is created:\n  <code>{(ENDL+"  ").join([each.strip() for each in remark.split("&")])}</code>'
+            if len(dbio.readAll(uid)) >= TODO_LIMIT:
+                result = 'Oops. There are too many to-dos on the list. Please remove some before adding a new one.'
             else:
-                result = f'We cannot create your to-do at this time. Please try again later.'
+                ec = dbio.addToDo(uid, remark)
+                if ec == 0:
+                    result = f'Your to-do is created:\n  <code>{(ENDL+"  ").join([each.strip() for each in remark.split("&")])}</code>'
+                else:
+                    result = f'We cannot create your to-do at this time. Please try again later.'
         return result
     except Exception as e:
         print(f'Error when handling a "/add" request from {str(uid)}: {e}')
