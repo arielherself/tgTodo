@@ -1,5 +1,6 @@
 import dbio
 
+ENDL = '\n'
 ERROR_PROMPT = 'We encountered an error when processing your request. Please try again.'
 
 def format(toDo: dbio.ToDo) -> str:
@@ -44,7 +45,7 @@ def add(uid: any, remark: str) -> str:
         else:
             ec = dbio.addToDo(uid, remark)
             if ec == 0:
-                result = f'Your to-do is created:\n  <code>{"\n  ".join([each.strip() for each in remark.split("&")])}</code>'
+                result = f'Your to-do is created:\n  <code>{(ENDL+"  ").join([each.strip() for each in remark.split("&")])}</code>'
             else:
                 result = f'We cannot create your to-do at this time. Please try again later.'
         return result
