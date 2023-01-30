@@ -35,7 +35,7 @@ async def reply(message: telebot.types.Message) -> int:
             if arg == '':
                 await bot.reply_to(message, event.get(message.from_user.id), parse_mode='html')
             else:
-                await bot.reply_to(message, event.get(arg))
+                await bot.reply_to(message, event.get(arg), parse_mode='html')
             return 0
         elif cmd == '/mark':
             await bot.reply_to(message, event.mark(message.from_user.id, arg), parse_mode='html')
