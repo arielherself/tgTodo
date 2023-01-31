@@ -31,6 +31,7 @@ def closeMarkup(chatID: int, messageID: int, userID: int) -> telebot.types.Inlin
 
 @bot.message_handler()
 async def reply(message: telebot.types.Message) -> int:
+    global recycleBin
     r = None
     f = False
     flag = False
@@ -108,6 +109,7 @@ async def delete_on_callback(callback_query: telebot.types.CallbackQuery):
         print(f'Error when handling a "close" request: {e}')
 
 async def autodel():
+    global recycleBin
     while True:
         try:
             for each in recycleBin:
