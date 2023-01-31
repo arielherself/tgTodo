@@ -18,10 +18,15 @@ def markup(lang:str='en') -> telebot.types.InlineKeyboardMarkup:
         m.add(telebot.types.InlineKeyboardButton('我也试试', switch_inline_query_current_chat=''), telebot.types.InlineKeyboardButton('创建一个待办', url='t.me/arielstodolistsbot'))
     return m
 
-def closeMarkup(listNamesArg: str, chatID: int, messageID: int, userID: int) -> telebot.types.InlineKeyboardMarkup:
+def multipleMarkup(listNamesArg: str, chatID: int, messageID: int, userID: int) -> telebot.types.InlineKeyboardMarkup:
     m = telebot.types.InlineKeyboardMarkup()
     m.add(telebot.types.InlineKeyboardButton('Update', callback_data=f'{chatID} {messageID} {userID} update {listNamesArg}'),
             telebot.types.InlineKeyboardButton('Close', callback_data=f'{chatID} {messageID} {userID} close'))
+    return m
+
+def closeMarkup(chatID: int, messageID: int, userID: int) -> telebot.types.InlineKeyboardMarkup:
+    m = telebot.types.InlineKeyboardMarkup()
+    m.add(telebot.types.InlineKeyboardButton('Close', callback_data=f'{chatID} {messageID} {userID} close'))
     return m
 
 @bot.message_handler()
@@ -43,32 +48,32 @@ async def reply(message: telebot.types.Message) -> int:
             cmd = cmd[:cmd.find('@')]
 
         if cmd in ['/start', '/help']:
-            r = await bot.reply_to(message, event.help(), parse_mode='html')
+            r = await bot.reply_to(message, event.help(), parse_mode='html', reply_markup=closeMarkup(message.chat.id, message.message_id, message.from_user.id))
         elif cmd == '/register':
             if arg == '':
-                r = await bot.reply_to(message, event.register(message.from_user.id))
+                r = await bot.reply_to(message, event.register(message.from_user.id), reply_markup=closeMarkup(message.chat.id, message.message_id, message.from_user.id))
             else:
-                r = await bot.reply_to(message, 'You cannot create a list for another user.')
+                r = await bot.reply_to(message, 'You cannot create a list for another user.', reply_markup=closeMarkup(message.chat.id, message.message_id, message.from_user.id))
         elif cmd == '/get':
             flag = True
             f = True
-            r = await bot.reply_to(message, event.get(message.from_user.id, arg), parse_mode='html', reply_markup=closeMarkup(arg, message.chat.id, message.message_id, message.from_user.id))
+            r = await bot.reply_to(message, event.get(message.from_user.id, arg), parse_mode='html', reply_markup=multipleMarkup(arg, message.chat.id, message.message_id, message.from_user.id))
         elif cmd == '/mark':
-            r = await bot.reply_to(message, event.mark(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.mark(message.from_user.id, arg), parse_mode='html', reply_markup=closeMarkup(message.chat.id, message.message_id, message.from_user.id))
         elif cmd == '/add':
-            r = await bot.reply_to(message, event.add(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.add(message.from_user.id, arg), parse_mode='html', reply_markup=closeMarkup(message.chat.id, message.message_id, message.from_user.id))
         elif cmd == '/del':
-            r = await bot.reply_to(message, event.delete(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.delete(message.from_user.id, arg), parse_mode='html', reply_markup=closeMarkup(message.chat.id, message.message_id, message.from_user.id))
         elif cmd == '/tag':
-            r = await bot.reply_to(message, event.tag(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.tag(message.from_user.id, arg), parse_mode='html', reply_markup=closeMarkup(message.chat.id, message.message_id, message.from_user.id))
         elif cmd == '/clear':
-            r = await bot.reply_to(message, event.clear(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.clear(message.from_user.id, arg), parse_mode='html', reply_markup=closeMarkup(message.chat.id, message.message_id, message.from_user.id))
         elif cmd == '/complete':
-            r = await bot.reply_to(message, event.complete(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.complete(message.from_user.id, arg), parse_mode='html', reply_markup=closeMarkup(message.chat.id, message.message_id, message.from_user.id))
         elif cmd == '/new_list':
-            r = await bot.reply_to(message, event.newList(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.newList(message.from_user.id, arg), parse_mode='html', reply_markup=closeMarkup(message.chat.id, message.message_id, message.from_user.id))
         elif cmd == '/del_list':
-            r = await bot.reply_to(message, event.delList(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.delList(message.from_user.id, arg), parse_mode='html', reply_markup=closeMarkup(message.chat.id, message.message_id, message.from_user.id))
         else:
             # await bot.reply_to(message, 'This is not a valid request. Try something within the command list or see /help')
             f = True
