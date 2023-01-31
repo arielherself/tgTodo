@@ -138,6 +138,7 @@ def tag(uid: any, tagname: str) -> str:
 def clear(uid: any, prompt: str) -> str:
     try:
         prompt, *listNames = prompt.split('@')
+        prompt = prompt.strip()
         if len(listNames) == 0:
             listNames = ['']
         if prompt.strip() == 'yes':
@@ -150,7 +151,10 @@ def clear(uid: any, prompt: str) -> str:
                 return 'Cannot clear your list. Please try again later.'
         else:
             if len(listNames) == 1 and listNames[0] == '':
-                return 'Are you sure you want to clear your to-do list? If so, please type\n  <code>/clear yes</code>'
+                if prompt == '':
+                    return 'Are you sure you want to clear your to-do list? If so, please type\n  <code>/clear yes</code>'
+                else:
+                    return f'Are you sure you want to clear your to-do list? If so, please type\n  <code>/clear yes@{prompt}</code>'
             else:                
                 return f'Are you sure you want to clear your to-do list? If so, please type\n  <code>/clear yes@{"@".join(listNames)}</code>'
     except Exception as e:
@@ -160,6 +164,7 @@ def clear(uid: any, prompt: str) -> str:
 def complete(uid: any, prompt: str) -> str:
     try:
         prompt, *listNames = prompt.split('@')
+        prompt = prompt.strip()
         if len(listNames) == 0:
             listNames = ['']
         if prompt.strip() == 'yes':
@@ -172,7 +177,10 @@ def complete(uid: any, prompt: str) -> str:
                 return 'Cannot complete your to-dos. Please try again later.'
         else:
             if len(listNames) == 1 and listNames[0] == '':
-                return 'Are you sure you want to complete all your to-dos? If so, please type\n  <code>/complete yes</code>'
+                if prompt == '':
+                    return 'Are you sure you want to complete all your to-dos? If so, please type\n  <code>/complete yes</code>'
+                else:
+                    return f'Are you sure you want to complete all your to-dos? If so, please type\n  <code>/complete yes@{prompt}</code>'
             else:
                 return f'Are you sure you want to complete all your to-dos? If so, please type\n  <code>/complete yes@{"@".join(listNames)}</code>'
     except Exception as e:
@@ -259,6 +267,7 @@ def newList(uid: any, remark: str) -> str:
 def delList(uid: any, prompt: str) -> str:
     try:
         prompt, *listNames = prompt.split('@')
+        prompt = prompt.strip()
         if len(listNames) == 0:
             listNames = ['']
         if prompt.strip() == 'yes':
@@ -271,7 +280,10 @@ def delList(uid: any, prompt: str) -> str:
                 return 'Cannot delete your lists. Please try again later.'
         else:
             if len(listNames) == 1 and listNames[0] == '':
-                return 'Your "Today" list will be deleted. After that, you need to /register before using this service again. Are you sure you want to delete your to-do list? If so, please type\n  <code>/del_list yes</code>'
+                if prompt == '':
+                    return 'Your "Today" list will be deleted. After that, you need to /register before using this service again. Are you sure you want to delete your to-do list? If so, please type\n  <code>/del_list yes</code>'
+                else:
+                    return f'Are you sure you want to delete your to-do list? If so, please type\n  <code>/del_list yes@{prompt}</code>'
             else:                
                 return f'Are you sure you want to delete your to-do lists? If so, please type\n  <code>/delete yes@{"@".join(listNames)}</code>'
     except Exception as e:
