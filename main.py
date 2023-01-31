@@ -65,9 +65,11 @@ async def reply(message: telebot.types.Message) -> int:
             # await bot.reply_to(message, 'This is not a valid request. Try something within the command list or see /help')
             f = True
     if r != None and (not flag):
-        recycleBin.append([r, 0])
+        await asyncio.sleep(10)
+        recycleBin.append(r)
     if not f:
-        recycleBin.append([message, 0])
+        await asyncio.sleep(10)
+        recycleBin.append(message)
 
 @bot.inline_handler(lambda _: True)
 async def inline_reply(inline_query: telebot.types.InlineQuery):
@@ -83,10 +85,7 @@ async def inline_reply(inline_query: telebot.types.InlineQuery):
 async def autodel():
     while True:
         for each in recycleBin:
-            if each[1] == 0:
-                each[1] += 1
-            else:
-                await bot.delete_message(each[0].chat.id, each[0].message_id)
+            await bot.delete_message(each.chat.id, each.message_id)
             recycleBin.remove(each)
         await asyncio.sleep(10)
 
