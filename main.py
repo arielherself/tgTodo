@@ -103,7 +103,7 @@ async def delete_on_callback(callback_query: telebot.types.CallbackQuery):
             await bot.delete_message(int(chatID1), int(messageID1))
             await bot.delete_message(int(chatID2), int(messageID2))
         elif operation.startswith('update '):
-            await bot.edit_message_text(event.get(userID, operation[7:]), chatID2, messageID2, parse_mode='html', reply_markup=closeMarkup(operation[7:], int(chatID1), int(messageID1), int(userID)))
+            await bot.edit_message_text(event.get(userID, operation[7:]), chatID2, messageID2, parse_mode='html', reply_markup=multipleMarkup(operation[7:], int(chatID1), int(messageID1), int(userID)))
     except Exception as e:
         print(f'Error when handling a "close" request: {e}')
 
