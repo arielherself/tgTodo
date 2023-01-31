@@ -77,7 +77,11 @@ def mark(uid: any, lN: any) -> str:
         for listName in listNames:
             stat += dbio.markToDo(uid, lN, listName)
         if stat == 0:
-            return f'Status of the following to-do(s) is updated:\n<code>{ENDL.join([format(dbio.getToDo(uid, l)) for l in lN.split("&")])}</code>'
+            result = f'Status of the following to-do(s) is updated:\n<code>'
+            for listName in listNames:
+                result += ENDL.join([format(dbio.getToDo(uid, l, listName)) for l in lN.split('&')]) + '\n'
+            result += '</code>'
+            return result
         else:
             return f'Cannot make changes to this to-do. Please check if you entered the correct item number.'
     except Exception as e:
@@ -96,7 +100,7 @@ def delete(uid: any, lN: any) -> str:
         for listName in listNames:
             stat += dbio.delToDo(uid, lN, listName)
         if stat == 0:
-            return 'The to-do is deleted.'
+            return 'The to-do(s) is deleted.'
         else:
             return f'Cannot delete this to-do. Please check if you entered the correct item number.'
     except Exception as e:

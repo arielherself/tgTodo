@@ -7,6 +7,7 @@ import local_secret
 TOKEN = local_secret.TODO_LISTS_BOT_TOKEN
 
 bot = AsyncTeleBot(TOKEN)
+recycleBin:list[telebot.types.Message] = []
 print('Ready.')
 
 def markup(lang:str='en') -> telebot.types.InlineKeyboardMarkup:
@@ -19,9 +20,11 @@ def markup(lang:str='en') -> telebot.types.InlineKeyboardMarkup:
 
 @bot.message_handler()
 async def reply(message: telebot.types.Message) -> int:
+    r = None
+    flag = False
     if not message.text.split(' ', 1)[0].startswith('/'):
         # await bot.reply_to(message, 'This is not a valid request. Try something within the command list or see /help')
-        return 0
+        pass
     else:
         l = message.text.split(' ', 1)
         if len(l) == 1:
@@ -33,32 +36,36 @@ async def reply(message: telebot.types.Message) -> int:
             cmd = cmd[:cmd.find('@')]
 
         if cmd in ['/start', '/help']:
-            await bot.reply_to(message, event.help(), parse_mode='html')
+            r = await bot.reply_to(message, event.help(), parse_mode='html')
         elif cmd == '/register':
             if arg == '':
-                await bot.reply_to(message, event.register(message.from_user.id))
+                r = await bot.reply_to(message, event.register(message.from_user.id))
             else:
-                await bot.reply_to(message, 'You cannot create a list for another user.')
+                r = await bot.reply_to(message, 'You cannot create a list for another user.')
         elif cmd == '/get':
-            await bot.reply_to(message, event.get(message.from_user.id, arg), parse_mode='html')
-            return 0
+            flag = True
+            r = await bot.reply_to(message, event.get(message.from_user.id, arg), parse_mode='html')
         elif cmd == '/mark':
-            await bot.reply_to(message, event.mark(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.mark(message.from_user.id, arg), parse_mode='html')
         elif cmd == '/add':
-            await bot.reply_to(message, event.add(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.add(message.from_user.id, arg), parse_mode='html')
         elif cmd == '/del':
-            await bot.reply_to(message, event.delete(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.delete(message.from_user.id, arg), parse_mode='html')
         elif cmd == '/tag':
-            await bot.reply_to(message, event.tag(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.tag(message.from_user.id, arg), parse_mode='html')
         elif cmd == '/clear':
-            await bot.reply_to(message, event.clear(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.clear(message.from_user.id, arg), parse_mode='html')
         elif cmd == '/complete':
-            await bot.reply_to(message, event.complete(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.complete(message.from_user.id, arg), parse_mode='html')
         elif cmd == '/new_list':
-            await bot.reply_to(message, event.newList(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.newList(message.from_user.id, arg), parse_mode='html')
         else:
             # await bot.reply_to(message, 'This is not a valid request. Try something within the command list or see /help')
-            return 0
+            pass
+    if r != None and (not flag):
+        recycleBin.append(r)
+    if not flag:
+        recycleBin.append(message)
 
 @bot.inline_handler(lambda _: True)
 async def inline_reply(inline_query: telebot.types.InlineQuery):
@@ -70,6 +77,13 @@ async def inline_reply(inline_query: telebot.types.InlineQuery):
         await bot.answer_inline_query(str(inline_query.id), [r1, r2])
     except Exception as e:
         print(f'Error when handling an inline request from {str(inline_query.from_user.id)}: {e}')
+
+async def autodel():
+    while True:
+        for each in recycleBin:
+            await bot.delete_message(each.chat.id, each.message_id)
+        await asyncio.sleep(10)
+
 
 if __name__ == '__main__':
     asyncio.run(bot.polling(non_stop=True, timeout=180))
