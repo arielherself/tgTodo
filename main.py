@@ -7,7 +7,7 @@ import local_secret
 TOKEN = local_secret.TODO_LISTS_BOT_TOKEN
 
 bot = AsyncTeleBot(TOKEN)
-recycleBin:list[telebot.types.Message] = []
+recycleBin:list = []
 print('Ready.')
 
 def markup(lang:str='en') -> telebot.types.InlineKeyboardMarkup:
@@ -65,9 +65,9 @@ async def reply(message: telebot.types.Message) -> int:
             # await bot.reply_to(message, 'This is not a valid request. Try something within the command list or see /help')
             f = True
     if r != None and (not flag):
-        recycleBin.append(r)
+        recycleBin.append([r, 0])
     if not f:
-        recycleBin.append(message)
+        recycleBin.append([message, 0])
 
 @bot.inline_handler(lambda _: True)
 async def inline_reply(inline_query: telebot.types.InlineQuery):
@@ -83,7 +83,10 @@ async def inline_reply(inline_query: telebot.types.InlineQuery):
 async def autodel():
     while True:
         for each in recycleBin:
-            await bot.delete_message(each.chat.id, each.message_id)
+            if each[1] == 0:
+                each[1] += 1
+            else:
+                await bot.delete_message(each[0].chat.id, each[0].message_id)
             recycleBin.remove(each)
         await asyncio.sleep(10)
 
