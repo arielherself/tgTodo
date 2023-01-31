@@ -109,10 +109,13 @@ async def delete_on_callback(callback_query: telebot.types.CallbackQuery):
 
 async def autodel():
     while True:
-        for each in recycleBin:
-            await bot.delete_message(each.chat.id, each.message_id)
-            recycleBin.remove(each)
-        await asyncio.sleep(10)
+        try:
+            for each in recycleBin:
+                await bot.delete_message(each.chat.id, each.message_id)
+                recycleBin.remove(each)
+            await asyncio.sleep(10)
+        except:
+            pass
 
 async def main():
     t1 = asyncio.create_task(bot.polling(non_stop=True, timeout=180))
