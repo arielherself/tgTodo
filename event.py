@@ -37,7 +37,7 @@ def get(uid: any, listName: str) -> str:
                     toDo: dbio.ToDo
                     result.append(format(toDo))
         allLists = dbio.seekList(uid)
-        if len(allLists) > 0:
+        if len(allLists) > 0 and listName == '':
             result.append('\n<i>You also have other lists. Use the following commands to access them:</i>')
             for l in allLists:
                 result.append(f'  <code>/get {l}</code>')
