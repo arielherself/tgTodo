@@ -20,7 +20,7 @@ def markup(lang:str='en') -> telebot.types.InlineKeyboardMarkup:
 @bot.message_handler()
 async def reply(message: telebot.types.Message) -> int:
     if not message.text.split(' ', 1)[0].startswith('/'):
-        await bot.reply_to(message, 'This is not a valid request. Try something within the command list or see /help')
+        # await bot.reply_to(message, 'This is not a valid request. Try something within the command list or see /help')
         return 0
     else:
         l = message.text.split(' ', 1)
@@ -58,7 +58,8 @@ async def reply(message: telebot.types.Message) -> int:
         elif cmd == '/complete':
             await bot.reply_to(message, event.complete(message.from_user.id, arg), parse_mode='html')
         else:
-            await bot.reply_to(message, 'This is not a valid request. Try something within the command list or see /help')
+            # await bot.reply_to(message, 'This is not a valid request. Try something within the command list or see /help')
+            return 0
 
 @bot.inline_handler(lambda _: True)
 async def inline_reply(inline_query: telebot.types.InlineQuery):
