@@ -36,6 +36,11 @@ def get(uid: any, listName: str) -> str:
                 for toDo in formattedDict[tag]:
                     toDo: dbio.ToDo
                     result.append(format(toDo))
+        allLists = dbio.seekList(uid)
+        if len(allLists) > 0:
+            result.append('\n<i>You also have other lists. Use the following commands to access them:</i>')
+            for l in allLists:
+                result.append(f'  <code>/get {l}</code>')
         return '\n'.join(result)
     except Exception as e:
         print(f'Error when formatting the list of {str(uid)}: {e}')

@@ -1,3 +1,4 @@
+import os
 from collections import namedtuple
 
 ENGLISH_TAG = ('英语', '单词', '听力', '口语', '四级', '六级', '托福', 'TOEFL', 'Toefl', 'toefl', 
@@ -7,6 +8,18 @@ ENTERTAINMENT_TAG = ('看剧', '追剧', '电影', '影视')
 
 
 ToDo = namedtuple('ToDo', ['lN', 'isFinished', 'remark'])
+
+def seekList(uid: any) -> list[str]:
+    try:
+        dbs = os.listdir('./data/')
+        result = []
+        for db in dbs:
+            if db.startswith(str(uid)+'_'):
+                result.append(db[db.find('_')+1:db.find('.db')])
+        return result
+    except Exception as e:
+        print(f'Error when seeking lists of {str(uid)}: {e}')
+        return []
 
 def create(uid: any, listAlias: str='') -> int:
     try:
