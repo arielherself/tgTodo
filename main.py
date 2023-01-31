@@ -21,10 +21,11 @@ def markup(lang:str='en') -> telebot.types.InlineKeyboardMarkup:
 @bot.message_handler()
 async def reply(message: telebot.types.Message) -> int:
     r = None
+    f = False
     flag = False
     if not message.text.split(' ', 1)[0].startswith('/'):
         # await bot.reply_to(message, 'This is not a valid request. Try something within the command list or see /help')
-        pass
+        f = True
     else:
         l = message.text.split(' ', 1)
         if len(l) == 1:
@@ -44,6 +45,7 @@ async def reply(message: telebot.types.Message) -> int:
                 r = await bot.reply_to(message, 'You cannot create a list for another user.')
         elif cmd == '/get':
             flag = True
+            f = True
             r = await bot.reply_to(message, event.get(message.from_user.id, arg), parse_mode='html')
         elif cmd == '/mark':
             r = await bot.reply_to(message, event.mark(message.from_user.id, arg), parse_mode='html')
@@ -61,10 +63,10 @@ async def reply(message: telebot.types.Message) -> int:
             r = await bot.reply_to(message, event.newList(message.from_user.id, arg), parse_mode='html')
         else:
             # await bot.reply_to(message, 'This is not a valid request. Try something within the command list or see /help')
-            pass
+            f = True
     if r != None and (not flag):
         recycleBin.append(r)
-    if not flag:
+    if not f:
         recycleBin.append(message)
 
 @bot.inline_handler(lambda _: True)
