@@ -148,13 +148,14 @@ def delToDo(uid: any, lN: str, listAlias: str='') -> int:
         print(f'Error when deleting a to-do for {str(uid)}: {e}')
         return 1
 
-def markToDo(uid: any, lN: any, listAlias: str='') -> any:
+def markToDo(uid: any, lN: any, listAlias: str='') -> int:
     try:
         if isinstance(lN, str) and '&' in lN:
             ls = lN.split('&')
             result = 0
             for each in ls:
                 result += markToDo(uid, each, listAlias)
+            return result
         else:
             toDoList: list = readAll(uid, listAlias)
             assert not -1 in toDoList
