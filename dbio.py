@@ -8,18 +8,20 @@ ENTERTAINMENT_TAG = ('看剧', '追剧', '电影', '影视')
 
 ToDo = namedtuple('ToDo', ['lN', 'isFinished', 'remark'])
 
-def create(uid: any) -> int:
+def create(uid: any, listAlias: str='') -> int:
     try:
-        with open(f'./data/{str(uid)}.db', 'a', encoding='utf8') as f:
+        filename = str(uid) if listAlias == '' else f'{str(uid)}_{listAlias}'
+        with open(f'./data/{filename}.db', 'a', encoding='utf8') as f:
             pass
         return 0
     except Exception as e:
         print(f'Error when creating a database for {str(uid)}: {e}')
         return 1
 
-def readAll(uid: any) -> list[ToDo]:
+def readAll(uid: any, listAlias: str='') -> list[ToDo]:
     try:
-        with open(f'./data/{str(uid)}.db', encoding='utf8') as f:
+        filename = str(uid) if listAlias == '' else f'{str(uid)}_{listAlias}'
+        with open(f'./data/{filename}.db', encoding='utf8') as f:
             lines = [each.strip() for each in f.readlines()]
         results = []
         for line in lines:
@@ -36,31 +38,32 @@ def readAll(uid: any) -> list[ToDo]:
         print(f'Error when reading the database of {str(uid)}: {e}')
         return [-1]
 
-def clearAll(uid: any) -> int:
+def clearAll(uid: any, listAlias: str='') -> int:
     try:
-        with open(f'./data/{str(uid)}.db', encoding='utf8') as f:
+        filename = str(uid) if listAlias == '' else f'{str(uid)}_{listAlias}'
+        with open(f'./data/{filename}.db', encoding='utf8') as f:
             pass
-        with open(f'./data/{str(uid)}.db', 'w', encoding='utf8') as f:
+        with open(f'./data/{filename}.db', 'w', encoding='utf8') as f:
             pass
         return 0
     except Exception as e:
         print(f'Error when clearing the database of {str(uid)}: {e}')
         return 1
 
-def writeAll(uid: any, toDoList: list[ToDo]) -> int:
+def writeAll(uid: any, toDoList: list[ToDo], listAlias: str='') -> int:
     try:
         db = []
         for toDo in toDoList:
             toDo: ToDo
             stat = 'x' if toDo.isFinished else 'o'
             db.append(f'{stat} {toDo.remark}')
-        with open(f'./data/{str(uid)}.db', 'w', encoding='utf8') as f:
+        filename = str(uid) if listAlias == '' else f'{str(uid)}_{listAlias}'
+        with open(f'./data/{filename}.db', 'w', encoding='utf8') as f:
             print(*db, sep='\n', file=f)
         return 0
     except Exception as e:
         print(f'Error when writing the database of {str(uid)}: {e}')
         return 1
-
 
 def classify(toDoList: list[ToDo]) -> dict:
     __doc__ = 'key: hashtag; value: [ToDo()]'
@@ -87,9 +90,9 @@ def classify(toDoList: list[ToDo]) -> dict:
         print(f'Error when classifying a list: {e}')
         return dict()
 
-def getToDo(uid: any, lN: any) -> ToDo:
+def getToDo(uid: any, lN: any, listAlias: str='') -> ToDo:
     try:
-        toDoList: list = readAll(uid)
+        toDoList: list = readAll(uid, listAlias)
         assert not -1 in toDoList
         for toDo in toDoList:
             if toDo.lN == int(lN):
@@ -99,14 +102,14 @@ def getToDo(uid: any, lN: any) -> ToDo:
         print(f'Error when reading a to-do for {str(uid)}: {e}')
         return ToDo('', False, '')
 
-def addToDo(uid: any, remark: str) -> int:
+def addToDo(uid: any, remark: str, listAlias: str='') -> int:
     try:
         remark = remark.strip()
         if '&' in remark:
             r1, r2 = remark.split('&', 1)
-            return addToDo(uid, r1) + addToDo(uid, r2)
+            return addToDo(uid, r1, listAlias) + addToDo(uid, r2, listAlias)
         else:
-            toDoList: list = readAll(uid)
+            toDoList: list = readAll(uid, listAlias)
             assert not -1 in toDoList
             for each in ENGLISH_TAG:
                 if each in remark:
@@ -121,16 +124,16 @@ def addToDo(uid: any, remark: str) -> int:
                     remark += ' #entertainment'
                     break
             toDoList.append(ToDo('', False, remark))
-            status = writeAll(uid, toDoList)
+            status = writeAll(uid, toDoList, listAlias)
             return status
     except Exception as e:
         print(f'Error when adding a to-do for {str(uid)}: {e}')
         return 1
 
-def delToDo(uid: any, lN: str) -> int:
+def delToDo(uid: any, lN: str, listAlias: str='') -> int:
     try:
         ls = [int(l.strip()) for l in lN.split('&')]
-        toDoList: list = readAll(uid)
+        toDoList: list = readAll(uid, listAlias)
         newList = []
         assert not -1 in toDoList
         flag = False
@@ -139,21 +142,21 @@ def delToDo(uid: any, lN: str) -> int:
                 newList.append(toDo)
                 flag = True
         assert flag
-        writeAll(uid, newList)
+        writeAll(uid, newList, listAlias)
         return 0
     except Exception as e:
         print(f'Error when deleting a to-do for {str(uid)}: {e}')
         return 1
 
-def markToDo(uid: any, lN: any) -> any:
+def markToDo(uid: any, lN: any, listAlias: str='') -> any:
     try:
         if isinstance(lN, str) and '&' in lN:
             ls = lN.split('&')
             result = 0
             for each in ls:
-                result += markToDo(uid, each)
+                result += markToDo(uid, each, listAlias)
         else:
-            toDoList: list = readAll(uid)
+            toDoList: list = readAll(uid, listAlias)
             assert not -1 in toDoList
             flag = False
             for i, toDo in enumerate(toDoList):
@@ -166,15 +169,15 @@ def markToDo(uid: any, lN: any) -> any:
                     flag = True
                     break
             assert flag
-            writeAll(uid, toDoList)
+            writeAll(uid, toDoList, listAlias)
             return 0
     except Exception as e:
         print(f'Error when marking a to-do for {str(uid)}: {e}')
         return 1
 
-def getTag(uid: any, tagname: any) -> list[ToDo]:
+def getTag(uid: any, tagname: any, listAlias: str='') -> list[ToDo]:
     try:
-        toDoDict: dict = classify(readAll(uid))
+        toDoDict: dict = classify(readAll(uid, listAlias))
         if str(tagname) in toDoDict.keys():
             return toDoDict[str(tagname)]
         else:
@@ -184,20 +187,23 @@ def getTag(uid: any, tagname: any) -> list[ToDo]:
         return []
         
 
-def completeAll(uid: any) -> int:
+def completeAll(uid: any, listAlias: str='') -> int:
     try:
-        toDoList = readAll(uid)
+        toDoList = readAll(uid, listAlias)
         newList = []
         assert not -1 in toDoList
         for toDo in toDoList:
             newList.append(ToDo(toDo.lN, True, toDo.remark))
-        writeAll(uid, newList)
+        writeAll(uid, newList, listAlias)
         return 0
     except Exception as e:
         print(f'Error when completing all to-dos for {str(uid)}: {e}')
         return 1
 
 def stat(uid: any) -> list[int]:
+    '''
+    Only for "Today" view.
+    '''
     try:
         toDoList = readAll(uid)
         if -1 in toDoList:

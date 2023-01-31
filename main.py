@@ -40,10 +40,7 @@ async def reply(message: telebot.types.Message) -> int:
             else:
                 await bot.reply_to(message, 'You cannot create a list for another user.')
         elif cmd == '/get':
-            if arg == '':
-                await bot.reply_to(message, event.get(message.from_user.id), parse_mode='html')
-            else:
-                await bot.reply_to(message, event.get(arg), parse_mode='html')
+            await bot.reply_to(message, event.get(message.from_user.id, arg), parse_mode='html')
             return 0
         elif cmd == '/mark':
             await bot.reply_to(message, event.mark(message.from_user.id, arg), parse_mode='html')
@@ -57,6 +54,8 @@ async def reply(message: telebot.types.Message) -> int:
             await bot.reply_to(message, event.clear(message.from_user.id, arg), parse_mode='html')
         elif cmd == '/complete':
             await bot.reply_to(message, event.complete(message.from_user.id, arg), parse_mode='html')
+        elif cmd == '/new_list':
+            await bot.reply_to(message, event.newList(message.from_user.id, arg), parse_mode='html')
         else:
             # await bot.reply_to(message, 'This is not a valid request. Try something within the command list or see /help')
             return 0

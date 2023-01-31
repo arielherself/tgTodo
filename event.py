@@ -21,13 +21,15 @@ def register(uid: any) -> str:
         print(f'Error when handling a "/register" request from {str(uid)}: {e}')
         return ERROR_PROMPT
 
-def get(uid: any) -> str:
+def get(uid: any, listName: str) -> str:
     try:
+        listName = listName.strip()
         result = []
-        db = dbio.readAll(uid)
+        db = dbio.readAll(uid, listName)
         if len(db) == 0:
-            result = ['User does not exist, or your list is empty. Please /register first.']
+            result = ['List is empty or does not exist. Please /register or /new_list first.']
         else:
+            result = [f'<b>{"Today" if listName == "" else listName}</b>\n']
             formattedDict: dict = dbio.classify(db)
             for tag in formattedDict.keys():
                 result.append(f'#{tag}')
@@ -43,12 +45,17 @@ def add(uid: any, remark: str) -> str:
     remark = remark.strip()
     try:
         if remark == '':
-            result = 'Well, please set a to-do like this:\n  <code>/add Have dinner with Ariel</code>\n  <code>/add study #maths</code>'
+            result = 'Well, please set a to-do like this:\n  <code>/add Have dinner with Ariel</code>\n  <code>/add study #maths @study</code>'
         else:
             if len(dbio.readAll(uid)) >= TODO_LIMIT:
                 result = 'Oops. There are too many to-dos on the list. Please remove some before adding a new one.'
             else:
-                ec = dbio.addToDo(uid, remark)
+                remark, *listNames = remark.split('@')
+                if len(listNames) == 0:
+                    listNames = ['']
+                ec = 0
+                for listName in listNames:
+                    ec += dbio.addToDo(uid, remark, listName)
                 if ec == 0:
                     result = f'Your to-do(s) is/are created:\n<code>  {(ENDL+"  ").join([each.strip() for each in remark.split("&")])}</code>'
                 else:
@@ -63,8 +70,13 @@ def mark(uid: any, lN: any) -> str:
     try:
         if lN == '':
             return 'Please specify a to-do like this:\n  <code>/mark 9</code>\n\nYou can use /get to find the numbering of your to-dos.'
-        stat = dbio.markToDo(uid, lN)
-        if stat != 1:
+        lN, *listNames = lN.split('@')
+        if len(listNames) == 0:
+            listNames = ['']
+        stat = 0
+        for listName in listNames:
+            stat += dbio.markToDo(uid, lN, listName)
+        if stat == 0:
             return f'Status of the following to-do(s) is updated:\n<code>{ENDL.join([format(dbio.getToDo(uid, l)) for l in lN.split("&")])}</code>'
         else:
             return f'Cannot make changes to this to-do. Please check if you entered the correct item number.'
@@ -77,7 +89,12 @@ def delete(uid: any, lN: any) -> str:
     try:
         if lN == '':
             return 'Please specify a to-do like this:\n  <code>/mark 9</code>\n\nYou can use /get to find the numbering of your to-dos.'
-        stat = dbio.delToDo(uid, lN)
+        lN, *listNames = lN.split('@')
+        if len(listNames) == 0:
+            listNames = ['']
+        stat = 0
+        for listName in listNames:
+            stat += dbio.delToDo(uid, lN, listName)
         if stat == 0:
             return 'The to-do is deleted.'
         else:
@@ -90,9 +107,14 @@ def tag(uid: any, tagname: str) -> str:
     tagname = tagname.strip()
     try:
         if tagname == '':
-            return 'Please specify a tag like this:\n <code>/tag homework</code>'
+            return 'Please specify a tag like this:\n  <code>/tag homework</code>\n  <code>/tag shopping@lifestyle</code>'
         else:
-            toDos: list[dbio.ToDo] = dbio.getTag(uid, tagname)
+            tagname, *listNames = tagname.split('@')
+            if len(listNames) == 0:
+                listNames = ['']
+            toDos: list[dbio.ToDo] = []
+            for listName in listNames:
+                toDos.extend(dbio.getTag(uid, tagname, listName))
             if len(toDos) == 0:
                 return "You don't have any to-dos under this tag."
             else:
@@ -106,28 +128,44 @@ def tag(uid: any, tagname: str) -> str:
 
 def clear(uid: any, prompt: str) -> str:
     try:
+        prompt, *listNames = prompt.split('@')
+        if len(listNames) == 0:
+            listNames = ['']
         if prompt.strip() == 'yes':
-            stat = dbio.clearAll(uid)
+            stat = 0
+            for listName in listNames:
+                stat += dbio.clearAll(uid, listName)
             if stat == 0:
-                return 'Your to-do list is empty!'
+                return 'Your to-do lists are empty!'
             else:
                 return 'Cannot clear your list. Please try again later.'
         else:
-            return 'Are you sure you want to clear your to-do list? If so, please type\n  <code>/clear yes</code>'
+            if len(listNames) == 1 and listNames[0] == '':
+                return 'Are you sure you want to clear your to-do list? If so, please type\n  <code>/clear yes</code>'
+            else:                
+                return f'Are you sure you want to clear your to-do list? If so, please type\n  <code>/clear yes@{"@".join(listNames)}</code>'
     except Exception as e:
         print(f'Error when handling a "/clear" request from {str(uid)}: {e}')
         return ERROR_PROMPT
 
 def complete(uid: any, prompt: str) -> str:
     try:
+        prompt, *listNames = prompt.split('@')
+        if len(listNames) == 0:
+            listNames = ['']
         if prompt.strip() == 'yes':
-            stat = dbio.completeAll(uid)
+            stat = 0
+            for listName in listNames:
+                stat += dbio.completeAll(uid, listName)
             if stat == 0:
                 return 'Well done! All your to-dos are completed.'
             else:
                 return 'Cannot complete your to-dos. Please try again later.'
         else:
-            return 'Are you sure you want to complete all your to-dos? If so, please type\n  <code>/complete yes</code>'
+            if len(listNames) == 1 and listNames[0] == '':
+                return 'Are you sure you want to complete all your to-dos? If so, please type\n  <code>/complete yes</code>'
+            else:
+                return f'Are you sure you want to complete all your to-dos? If so, please type\n  <code>/complete yes@{"@".join(listNames)}</code>'
     except Exception as e:
         print(f'Error when handling a "/complete" request from {str(uid)}: {e}')
         return ERROR_PROMPT
@@ -177,4 +215,19 @@ def checkin(uid: any, remark: str, lang: str) -> str:
             return result
     except Exception as e:
         print(f'Error when handling an inline query from {str(uid)}: {e}')
+        return ERROR_PROMPT
+
+def newList(uid: any, remark: str) -> str:
+    try:
+        remark = remark.strip()
+        if (not remark.isalnum()) and remark != 'Today':
+            return 'Please use a list name which only consists of alphabetic and numeric characters. If you want to enter multiple words, consider camelCase.'
+        else:
+            stat = dbio.create(uid, remark)
+            if stat == 0:
+                return f'To-do list created: {remark}'
+            else:
+                return 'We cannot create this list now. Please try again later.'
+    except Exception as e:
+        print(f'Error when handling a "/newList" request from {str(uid)}: {e}')
         return ERROR_PROMPT
