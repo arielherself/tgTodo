@@ -27,7 +27,7 @@ def get(uid: any, listName: str) -> str:
         result = []
         db = dbio.readAll(uid, listName)
         if len(db) == 0:
-            result = ['List is empty or does not exist. Please /register or /new_list first.']
+            result = ['List is empty or does not exist. Please /register or /new_list first. Examples:\n  <code>/get</code>\n  <code>/get homework</code>']
         else:
             result = [f'<b>{"Today" if listName == "" else listName}</b>\n']
             formattedDict: dict = dbio.classify(db)
@@ -45,7 +45,7 @@ def add(uid: any, remark: str) -> str:
     remark = remark.strip()
     try:
         if remark == '':
-            result = 'Well, please set a to-do like this:\n  <code>/add Have dinner with Ariel</code>\n  <code>/add study #maths @study</code>'
+            result = 'Well, please set a to-do like this:\n  <code>/add Have dinner with Ariel</code>\n  <code>/add study #maths @study</code>\n  <code>/add call Moonstones&write the letter@social</code>'
         else:
             if len(dbio.readAll(uid)) >= TODO_LIMIT:
                 result = 'Oops. There are too many to-dos on the list. Please remove some before adding a new one.'
@@ -69,7 +69,7 @@ def mark(uid: any, lN: any) -> str:
     lN = str(lN).strip()
     try:
         if lN == '':
-            return 'Please specify a to-do like this:\n  <code>/mark 9</code>\n\nYou can use /get to find the numbering of your to-dos.'
+            return 'Please specify a to-do like this:\n  <code>/mark 9</code>\n  <code>/mark 2&3&4</code>\n  <code>/mark 2&3@lifestyle@homework</code>\n  <code> /mark 4@@fee</code>\n\nYou can use /get to find the numbering of your to-dos.'
         lN, *listNames = lN.split('@')
         if len(listNames) == 0:
             listNames = ['']
@@ -92,7 +92,7 @@ def delete(uid: any, lN: any) -> str:
     lN = str(lN).strip()
     try:
         if lN == '':
-            return 'Please specify a to-do like this:\n  <code>/mark 9</code>\n\nYou can use /get to find the numbering of your to-dos.'
+            return 'Please specify a to-do like this:\n  <code>/del 9</code>\n  <code>/del 2&3&4</code>\n  <code>/del 2&3@lifestyle@homework</code>\n  <code> /del 4@@fee</code>\n\nYou can use /get to find the numbering of your to-dos.'
         lN, *listNames = lN.split('@')
         if len(listNames) == 0:
             listNames = ['']
@@ -111,7 +111,7 @@ def tag(uid: any, tagname: str) -> str:
     tagname = tagname.strip()
     try:
         if tagname == '':
-            return 'Please specify a tag like this:\n  <code>/tag homework</code>\n  <code>/tag shopping@lifestyle</code>'
+            return 'Please specify a tag like this:\n  <code>/tag homework</code>\n  <code>/tag shopping@lifestyle@family</code>'
         else:
             tagname, *listNames = tagname.split('@')
             if len(listNames) == 0:
@@ -225,7 +225,7 @@ def newList(uid: any, remark: str) -> str:
     try:
         remark = remark.strip()
         if (not remark.isalnum()) and remark != 'Today':
-            return 'Please use a list name which only consists of alphabetic and numeric characters. If you want to enter multiple words, consider camelCase.'
+            return 'Please use a list name which only consists of alphabetic and numeric characters. If you want to enter multiple words, consider camelCase. Example:\n  <code>/new_list shoppingList</code>'
         else:
             stat = dbio.create(uid, remark)
             if stat == 0:
