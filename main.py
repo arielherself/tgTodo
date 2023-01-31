@@ -84,6 +84,11 @@ async def autodel():
             await bot.delete_message(each.chat.id, each.message_id)
         await asyncio.sleep(10)
 
+async def main():
+    t1 = asyncio.create_task(bot.polling(non_stop=True, timeout=180))
+    t2 = asyncio.create_task(autodel())
+    await t1
+    await t2
 
 if __name__ == '__main__':
-    asyncio.run(bot.polling(non_stop=True, timeout=180))
+    asyncio.run(main())
