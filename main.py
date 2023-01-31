@@ -89,7 +89,7 @@ async def inline_reply(inline_query: telebot.types.InlineQuery):
 @bot.callback_query_handler(lambda _: True)
 async def delete_on_callback(callback_query: telebot.types.CallbackQuery):
     try:
-        chatID1, messageID1 = ' '.split(callback_query.data)
+        chatID1, messageID1 = callback_query.data.split(' ')
         chatID2, messageID2 = callback_query.message.chat.id, callback_query.message.message_id
         await bot.delete_message(int(chatID1), int(messageID1))
         await bot.delete_message(int(chatID2), int(messageID2))
