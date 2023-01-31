@@ -1,3 +1,4 @@
+import datetime
 import dbio
 
 ENDL = '\n'
@@ -133,3 +134,47 @@ def complete(uid: any, prompt: str) -> str:
 
 def help() -> str:
     return "<b>Welcome to Ariel's To-do Lists!</b>\nTo get started, type /register and then use /add to add a to-do."
+
+def checkin(uid: any, remark: str, lang: str) -> str:
+    try:
+        total, finished, unfinished = dbio.stat(uid)
+        if total == -1:
+            if lang == 'en':
+                return 'Unable to get stats now. Please try again later.'
+            elif lang == 'zh':
+                return '现在无法获取统计信息。请稍后再试。'
+            else:
+                return ''
+        elif total == 0:
+            if lang == 'en':
+                return 'Have nothing to do today.'
+            elif lang == 'zh':
+                return '今天没有什么要做的事。又是摆烂的一天？'
+            else:
+                return ''
+        elif total == finished:
+            if lang == 'en':
+                result = f'{str(datetime.date.today())}\nWell done! You have finished all you {total} to-dos.\n\n<i>"{remark.strip()}"</i>\n\nWhat you finished:\n'
+            elif lang == 'zh':
+                result = f'{str(datetime.date.today())}\n好活! 你已经完成了你所有的 {total} 项待办.\n\n<i>"{remark.strip()}"</i>\n\n已完成的待办:\n'
+            else:
+                result = ''
+            toDoList = dbio.readAll(uid)
+            for toDo in toDoList:
+                result += format(toDo) + '\n'
+            return result
+        else:
+            if lang == 'en':
+                result = f'You still have {unfinished} to-dos to go:\n'
+            elif lang == 'zh':
+                result = f'你还有 {unfinished} 项待办没有完成:\n'
+            else:
+                result = ''
+            toDoList = dbio.readAll(uid)
+            for toDo in toDoList:
+                if toDo.isFinished == False:
+                    result += format(toDo) + '\n'
+            return result
+    except Exception as e:
+        print(f'Error when handling an inline query from {str(uid)}: {e}')
+        return ERROR_PROMPT

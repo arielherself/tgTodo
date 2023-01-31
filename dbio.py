@@ -196,3 +196,21 @@ def completeAll(uid: any) -> int:
     except Exception as e:
         print(f'Error when completing all to-dos for {str(uid)}: {e}')
         return 1
+
+def stat(uid: any) -> list[int]:
+    try:
+        toDoList = readAll(uid)
+        if -1 in toDoList:
+            return [-1, -1, -1]
+        else:
+            total, finished, unfinished = 0, 0, 0
+            for toDo in toDoList:
+                if toDo.isFinished == True:
+                    finished += 1
+                else:
+                    unfinished += 1
+                total += 1
+            return [total, finished, unfinished]
+    except Exception as e:
+        print(f'Error when doing statistics for {str(uid)}: {e}')
+        return [-1, -1, -1]
