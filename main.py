@@ -67,6 +67,8 @@ async def reply(message: telebot.types.Message) -> int:
             r = await bot.reply_to(message, event.complete(message.from_user.id, arg), parse_mode='html')
         elif cmd == '/new_list':
             r = await bot.reply_to(message, event.newList(message.from_user.id, arg), parse_mode='html')
+        elif cmd == '/del_list':
+            r = await bot.reply_to(message, event.delList(message.from_user.id, arg), parse_mode='html')
         else:
             # await bot.reply_to(message, 'This is not a valid request. Try something within the command list or see /help')
             f = True

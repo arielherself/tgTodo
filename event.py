@@ -240,3 +240,40 @@ def newList(uid: any, remark: str) -> str:
     except Exception as e:
         print(f'Error when handling a "/newList" request from {str(uid)}: {e}')
         return ERROR_PROMPT
+
+def newList(uid: any, remark: str) -> str:
+    try:
+        remark = remark.strip()
+        if (not remark.isalnum()) and remark != 'Today':
+            return 'Please use a list name which only consists of alphabetic and numeric characters. If you want to enter multiple words, consider camelCase. Example:\n  <code>/new_list shoppingList</code>'
+        else:
+            stat = dbio.create(uid, remark)
+            if stat == 0:
+                return f'To-do list created: {remark}'
+            else:
+                return 'We cannot create this list now. Please try again later.'
+    except Exception as e:
+        print(f'Error when handling a "/newList" request from {str(uid)}: {e}')
+        return ERROR_PROMPT
+
+def delList(uid: any, prompt: str) -> str:
+    try:
+        prompt, *listNames = prompt.split('@')
+        if len(listNames) == 0:
+            listNames = ['']
+        if prompt.strip() == 'yes':
+            stat = 0
+            for listName in listNames:
+                stat += dbio.deleteAll(uid, listName)
+            if stat == 0:
+                return 'Your lists are deleted!'
+            else:
+                return 'Cannot delete your lists. Please try again later.'
+        else:
+            if len(listNames) == 1 and listNames[0] == '':
+                return 'Your "Today" list will be deleted. After that, you need to /register before using this service again. Are you sure you want to delete your to-do list? If so, please type\n  <code>/del_list yes</code>'
+            else:                
+                return f'Are you sure you want to delete your to-do lists? If so, please type\n  <code>/delete yes@{"@".join(listNames)}</code>'
+    except Exception as e:
+        print(f'Error when handling a "/delete" request from {str(uid)}: {e}')
+        return ERROR_PROMPT

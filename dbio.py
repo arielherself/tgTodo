@@ -63,6 +63,14 @@ def clearAll(uid: any, listAlias: str='') -> int:
         print(f'Error when clearing the database of {str(uid)}: {e}')
         return 1
 
+def deleteAll(uid: any, listAlias: str='') -> int:
+    try:
+        filename = str(uid) if listAlias == '' else f'{str(uid)}_{listAlias}'
+        return os.system(f'rm ./data/{filename}.db')
+    except Exception as e:
+        print(f'Error when clearing the database of {str(uid)}: {e}')
+        return 1
+
 def writeAll(uid: any, toDoList: list[ToDo], listAlias: str='') -> int:
     try:
         db = []
