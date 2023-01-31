@@ -18,6 +18,11 @@ def markup(lang:str='en') -> telebot.types.InlineKeyboardMarkup:
         m.add(telebot.types.InlineKeyboardButton('我也试试', switch_inline_query_current_chat=''), telebot.types.InlineKeyboardButton('创建一个待办', url='t.me/arielstodolistsbot'))
     return m
 
+def closeMarkup(from_message: telebot.types.Message) -> telebot.types.InlineKeyboardMarkup:
+    m = telebot.types.InlineKeyboardMarkup()
+    m.add(telebot.types.InlineKeyboardButton('Close', callback_data=f'{from_message.chat.id} {from_message.message_id}'))
+    return m
+
 @bot.message_handler()
 async def reply(message: telebot.types.Message) -> int:
     r = None
@@ -46,7 +51,7 @@ async def reply(message: telebot.types.Message) -> int:
         elif cmd == '/get':
             flag = True
             f = True
-            r = await bot.reply_to(message, event.get(message.from_user.id, arg), parse_mode='html')
+            r = await bot.reply_to(message, event.get(message.from_user.id, arg), parse_mode='html', reply_markup=closeMarkup(message))
         elif cmd == '/mark':
             r = await bot.reply_to(message, event.mark(message.from_user.id, arg), parse_mode='html')
         elif cmd == '/add':
@@ -80,6 +85,16 @@ async def inline_reply(inline_query: telebot.types.InlineQuery):
         await bot.answer_inline_query(str(inline_query.id), [r1, r2])
     except Exception as e:
         print(f'Error when handling an inline request from {str(inline_query.from_user.id)}: {e}')
+
+@bot.callback_query_handler(lambda _: True)
+async def delete_on_callback(callback_query: telebot.types.CallbackQuery):
+    try:
+        chatID1, messageID1 = ' '.split(callback_query.data)
+        chatID2, messageID2 = callback_query.message.chat.id, callback_query.message.message_id
+        await bot.delete_message(int(chatID1), int(messageID1))
+        await bot.delete_message(int(chatID2), int(messageID2))
+    except Exception as e:
+        print(f'Error when handling a "close" request: {e}')
 
 async def autodel():
     while True:
