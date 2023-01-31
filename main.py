@@ -64,11 +64,10 @@ async def reply(message: telebot.types.Message) -> int:
         else:
             # await bot.reply_to(message, 'This is not a valid request. Try something within the command list or see /help')
             f = True
+    await asyncio.sleep(10)
     if r != None and (not flag):
-        await asyncio.sleep(10)
         recycleBin.append(r)
     if not f:
-        await asyncio.sleep(10)
         recycleBin.append(message)
 
 @bot.inline_handler(lambda _: True)
