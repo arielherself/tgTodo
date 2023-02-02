@@ -157,12 +157,9 @@ def delToDo(uid: any, lN: str, listAlias: str='') -> int:
         toDoList: list = readAll(uid, listAlias)
         newList = []
         assert not -1 in toDoList
-        flag = False
         for toDo in toDoList:
             if not toDo.lN in ls:
                 newList.append(toDo)
-                flag = True
-        assert flag
         writeAll(uid, newList, listAlias)
         return 0
     except Exception as e:
