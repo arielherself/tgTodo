@@ -3,7 +3,7 @@ import dbio
 
 ENDL = '\n'
 TODO_LIMIT = 20
-ERROR_PROMPT = 'We encountered an error when processing your request. Please try again.'
+ERROR_PROMPT = 'We encountered an error when processing your request. Please check if you have /register -ed and try again.'
 
 def format(toDo: dbio.ToDo) -> str:
     if toDo.isFinished:
