@@ -97,19 +97,20 @@ async def inline_reply(inline_query: telebot.types.InlineQuery):
 
 @bot.callback_query_handler(lambda _: True)
 async def delete_on_callback(callback_query: telebot.types.CallbackQuery):
+    global recycleBin
     try:
         chatID1, messageID1, userID, operation = callback_query.data.split(' ', 3)
         chatID2, messageID2 = callback_query.message.chat.id, callback_query.message.message_id
         if operation == 'close':
             await bot.delete_message(int(chatID1), int(messageID1))
             await bot.delete_message(int(chatID2), int(messageID2))
+            await singledel(recycleBin)
         elif operation.startswith('update '):
             await bot.edit_message_text(event.get(userID, operation[7:]), chatID2, messageID2, parse_mode='html', reply_markup=multipleMarkup(operation[7:], int(chatID1), int(messageID1), int(userID)))
     except Exception as e:
         print(f'Error when handling a "close" request: {e}')
 
-async def autodel():
-    global recycleBin
+async def autodel(recycleBin):
     while True:
         try:
             for each in recycleBin:
@@ -119,11 +120,19 @@ async def autodel():
         except:
             pass
 
-async def main():
+async def singledel(recycleBin):
+    try:
+        for each in recycleBin:
+            await bot.delete_message(each.chat.id, each.message_id)
+            recycleBin.remove(each)
+    except:
+        pass
+
+async def main(recycleBin):
     t1 = asyncio.create_task(bot.polling(non_stop=True, timeout=180))
-    t2 = asyncio.create_task(autodel())
+    t2 = asyncio.create_task(autodel(recycleBin))
     await t1
     await t2
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    asyncio.run(main(recycleBin))
