@@ -26,7 +26,7 @@ def get(uid: any, listName: str) -> str:
         listName = listName.strip()
         result = []
         db = dbio.readAll(uid, listName)
-        if len(db) == 0:
+        if len(db) == 0 or -1 in db:
             result = ['List is empty or does not exist. Please /register or /new_list first. Examples:\n  <code>/get</code>\n  <code>/get homework</code>']
         else:
             result = [f'<b>{"Today" if listName == "" else listName}</b>\n']
