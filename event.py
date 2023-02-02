@@ -64,7 +64,7 @@ def add(uid: any, remark: str) -> str:
                 if ec == 0:
                     result = f'Your to-do(s) is/are created:\n<code>  {(ENDL+"  ").join([each.strip() for each in remark.split("&")])}</code>'
                 else:
-                    result = f'We cannot create your to-do at this time. Please try again later.'
+                    result = f'We cannot create your to-do at this time. This can be caused by:\n  - misspelling of a list name;\n  - unsupported usage;\n  - server-side error.'
         return result
     except Exception as e:
         print(f'Error when handling a "/add" request from {str(uid)}: {e}')
@@ -88,7 +88,7 @@ def mark(uid: any, lN: any) -> str:
             result += '</code>'
             return result
         else:
-            return f'Cannot make changes to this to-do. Please check if you entered the correct item number.'
+            return f'Cannot make changes to this to-do. This can be caused by:\n  - citation of a nonexistent to-do;\n  - misspelling of a list name;\n  - unsupported usage;\n  - server-side error.'
     except Exception as e:
         print(f'Error when handling a "/mark" request from {str(uid)}: {e}')
         return ERROR_PROMPT
@@ -107,7 +107,7 @@ def delete(uid: any, lN: any) -> str:
         if stat == 0:
             return 'The to-do(s) is deleted.'
         else:
-            return f'Cannot delete this to-do. Please check if you entered the correct item number.'
+            return f'Cannot delete this to-do. This can be caused by:\n  - citation of a nonexistent to-do;\n  - misspelling of a list name;\n  - unsupported usage;\n  - server-side error.'
     except Exception as e:
         print(f'Error when handling a "/del" request from {str(uid)}: {e}')
         return ERROR_PROMPT
@@ -148,7 +148,7 @@ def clear(uid: any, prompt: str) -> str:
             if stat == 0:
                 return 'Your to-do lists are empty!'
             else:
-                return 'Cannot clear your list. Please try again later.'
+                return 'Cannot clear your list. This can be caused by:\n  - misspelling of a list name;\n  - unsupported usage;\n  - server-side error.'
         else:
             if len(listNames) == 1 and listNames[0] == '':
                 if prompt == '':
@@ -174,7 +174,7 @@ def complete(uid: any, prompt: str) -> str:
             if stat == 0:
                 return 'Well done! All your to-dos are completed.'
             else:
-                return 'Cannot complete your to-dos. Please try again later.'
+                return 'Cannot complete your to-dos. This can be caused by:\n  - misspelling of a list name;\n  - unsupported usage;\n  - server-side error.'
         else:
             if len(listNames) == 1 and listNames[0] == '':
                 if prompt == '':
@@ -249,21 +249,6 @@ def newList(uid: any, remark: str) -> str:
         print(f'Error when handling a "/newList" request from {str(uid)}: {e}')
         return ERROR_PROMPT
 
-def newList(uid: any, remark: str) -> str:
-    try:
-        remark = remark.strip()
-        if (not remark.isalnum()) and remark != 'Today':
-            return 'Please use a list name which only consists of alphabetic and numeric characters. If you want to enter multiple words, consider camelCase. Example:\n  <code>/new_list shoppingList</code>'
-        else:
-            stat = dbio.create(uid, remark)
-            if stat == 0:
-                return f'To-do list created: {remark}'
-            else:
-                return 'We cannot create this list now. Please try again later.'
-    except Exception as e:
-        print(f'Error when handling a "/newList" request from {str(uid)}: {e}')
-        return ERROR_PROMPT
-
 def delList(uid: any, prompt: str) -> str:
     try:
         prompt, *listNames = prompt.split('@')
@@ -277,7 +262,7 @@ def delList(uid: any, prompt: str) -> str:
             if stat == 0:
                 return 'Your lists are deleted!'
             else:
-                return 'Cannot delete your lists. Please try again later.'
+                return 'Cannot delete your lists. This can be caused by:\n  - misspelling of a list name;\n  - unsupported usage;\n  - server-side error.'
         else:
             if len(listNames) == 1 and listNames[0] == '':
                 if prompt == '':
